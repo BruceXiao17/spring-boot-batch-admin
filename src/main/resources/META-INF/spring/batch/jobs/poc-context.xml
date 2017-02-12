@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="poc" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet start-limit="100">
+				<chunk commit-interval="1" reader="itemReader" writer="itemWriter" />
+			</tasklet>
+		</step>
+	</job>
+	
+	<job id="poc2" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step2">
+			<tasklet start-limit="100">
+				<chunk commit-interval="1" reader="pocItemReader" writer="pocItemWriter" />
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="itemWriter" class="com.xiao.geeker.springbatchboot.sample.ExampleItemWriter"/>
+	<bean id="itemReader" class="com.xiao.geeker.springbatchboot.sample.ExampleItemReader" scope="step"/>
+	
+	<bean id="pocItemWriter" class="com.xiao.geeker.springbatchboot.sample.PocItemWriter">
+	</bean>
+
+	<bean id="pocItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+	    <property name="dataSource" ref="pocDataSource" />
+		<property name="sql" value="select * from user" />
+		<property name="rowMapper">
+			<bean class="com.xiao.geeker.springbatchboot.mapper.UserRowMapper" />
+		</property>
+	</bean>
+</beans>
